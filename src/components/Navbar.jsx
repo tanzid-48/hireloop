@@ -61,7 +61,7 @@ export default function Navbar() {
             </Link>
 
             <Link
-              href="/get-started"
+              href="/signup"
               className="text-sm px-5 py-2 bg-white text-black rounded-xl font-semibold hover:bg-gray-100 transition-colors"
             >
               Get Started
@@ -118,7 +118,7 @@ export default function Navbar() {
               Sign In
             </Link>
             <Link
-              href="/get-started"
+              href="/signup"
               onClick={() => setMenuOpen(false)}
               className="w-full py-2.5 bg-white text-black rounded-xl text-sm font-semibold text-center hover:bg-gray-100 transition-colors"
             >
