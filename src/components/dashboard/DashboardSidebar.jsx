@@ -36,13 +36,16 @@ const DashboardSidebar = () => {
   );
 
   return (
-  <>
-     <aside>
-        <div className="hidden md:flex flex-col gap-1 p-4 w-64 bg-default">
-            {navContent}
-        </div>      
-        </aside>
-       
+    <>
+      <aside>
+        <div
+          className="hidden md:flex flex-col gap-1 p-4 bg-[#0a0a12] border-r border-white/10 min-h-screen"
+          style={{ width: "250px", minWidth: "250px" }}
+        >
+          {navContent}
+        </div>
+      </aside>
+
       <Drawer>
         <Button className=" md:hidden" variant="secondary">
           <LayoutSideContentRight />
@@ -60,8 +63,7 @@ const DashboardSidebar = () => {
           </Drawer.Content>
         </Drawer.Backdrop>
       </Drawer>
-    
-  </>
+    </>
   );
 };
 
