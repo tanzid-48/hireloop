@@ -9,6 +9,8 @@ import {
   PersonWorker,
   ArrowUpFromSquare,
 } from "@gravity-ui/icons";
+import { createJob } from "@/lib/action/jobs";
+import { toast } from "sonner";
 
 const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Internship"];
 const CURRENCIES = ["USD", "EUR", "GBP", "BDT", "INR", "AED"];
@@ -281,7 +283,9 @@ export default function NewJobsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
+
     setIsSubmitting(true);
+
     try {
       const payload = {
         ...form,
@@ -290,17 +294,21 @@ export default function NewJobsPage() {
         currency,
         employeeRange,
         isRemote,
+        companyId: 'company_123', //TODO: Replace with actual company ID from session/auth
         status: "active",
       };
-      console.log(payload);
-      const res = await fetch("/api/jobs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (res.ok) router.push("/dashboard/recruiter/jobs");
+
+      const result = await createJob(payload);
+
+      if (result) {
+        toast.success(`${form.title} created successfully!`);
+        router.push("/dashboard/recruiter/jobs");
+      } else {
+        throw new Error("Something went wrong");
+      }
     } catch (err) {
       console.error(err);
+      toast.error("Failed to post job. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
