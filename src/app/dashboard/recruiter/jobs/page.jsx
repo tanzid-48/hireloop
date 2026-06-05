@@ -1,10 +1,14 @@
-import { getCompanyJobs } from '@/lib/api/jobs';
+import { getCompanyByUserId, getCompanyJobs } from '@/lib/api/jobs';
 import JobsTable from '@/components/dashboard/JobsTable';
 import Link from 'next/link';
+import { getSession } from '@/lib/auth-session';
 
 const RecruiterJobsPage = async () => {
-  const companyId = 'company_123'; // TODO: Replace with actual company ID
-  const jobs = await getCompanyJobs(companyId);
+
+   const session = await getSession();
+  const userId = session?.user?.id;
+    const company = await getCompanyByUserId(userId);
+  const jobs = company ? await getCompanyJobs(company._id) : [];
 
   return (
     <div className="flex flex-col gap-6 max-w-6xl">

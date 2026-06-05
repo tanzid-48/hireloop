@@ -12,7 +12,7 @@ const RecruiterCompanyPage = async () => {
   const company = await getRecruiterCompany(recruiterId);
 
   return (
-    <div className="flex flex-col gap-6 max-w-3xl">
+    <div className="flex flex-col gap-6 max-w-3xl mx-auto">
       <div>
         <span className="text-[10px] font-bold tracking-[3px] uppercase text-violet-400/70">
           Settings

@@ -19,7 +19,7 @@ export default function Navbar() {
 
   const { data: session } = useSession();
   const user = session?.user;
-  console.log("Current user:", user);
+
 
 
   const pathname = usePathname();
