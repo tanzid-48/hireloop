@@ -8,6 +8,7 @@ import {
   CircleCheck,
   Clock,
   CircleXmark,
+  MapPin,
   OfficeBadge,
 } from "@gravity-ui/icons";
 
@@ -46,7 +47,7 @@ export default function CompanyCard({ company }) {
       value: company.website ? `https://${company.website}` : "—",
       link: company.website,
     },
-    { icon: OfficeBadge, label: "Location", value: company.location || "—" },
+    { icon: MapPin, label: "Location", value: company.location || "—" },
     {
       icon: PersonWorker,
       label: "Team Size",

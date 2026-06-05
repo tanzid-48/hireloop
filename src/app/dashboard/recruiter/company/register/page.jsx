@@ -10,6 +10,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { createCompany } from "@/lib/action/company";
+import { useSession } from "@/lib/auth-client";
 
 const CATEGORIES = [
   "Technology",
@@ -157,6 +158,10 @@ const StepHeader = ({ step, title }) => (
 );
 
 export default function RegisterCompanyPage() {
+
+   const { data: session } = useSession();
+  const recruiterId = session?.user?.id;
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const isEdit = searchParams.get("edit") === "true";
@@ -241,6 +246,7 @@ export default function RegisterCompanyPage() {
     try {
       const payload = {
         ...form,
+          recruiterId, 
         logo: logoPreview,
         logoName,
         industry: category,
