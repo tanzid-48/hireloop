@@ -12,3 +12,20 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
     });
     return res.json();
 };
+
+export const updateCompany = async (companyId, updatedData) => {
+  const res = await fetch(`${baseUrl}/api/companies/${companyId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updatedData),
+  });
+  return res.json();
+};
+
+export const getCompanyById = async (companyId) => {
+  const res = await fetch(`${baseUrl}/api/companies/${companyId}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) return null;
+  return res.json();
+};

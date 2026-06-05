@@ -9,7 +9,11 @@ import {
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { createCompany } from "@/lib/action/company";
+import {
+  createCompany,
+  getCompanyById,
+  updateCompany,
+} from "@/lib/action/company";
 import { useSession } from "@/lib/auth-client";
 
 const CATEGORIES = [
@@ -158,8 +162,7 @@ const StepHeader = ({ step, title }) => (
 );
 
 export default function RegisterCompanyPage() {
-
-   const { data: session } = useSession();
+  const { data: session } = useSession();
   const recruiterId = session?.user?.id;
 
   const router = useRouter();
@@ -183,21 +186,19 @@ export default function RegisterCompanyPage() {
 
   useEffect(() => {
     if (!isEdit || !companyId) return;
-    fetch(`/api/companies/${companyId}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setForm({
-          name: data.name || "",
-          website: data.website || "",
-          location: data.location || "",
-          description: data.description || "",
-        });
-        setCategory(data.industry || "");
-        setEmployeeRange(data.employeeRange || "");
-        setLogoPreview(data.logo || null);
-        setLogoName(data.logoName || "");
-      })
-      .catch(console.error);
+    getCompanyById(companyId).then((data) => {
+      if (!data) return;
+      setForm({
+        name: data.name || "",
+        website: data.website || "",
+        location: data.location || "",
+        description: data.description || "",
+      });
+      setCategory(data.industry || "");
+      setEmployeeRange(data.employeeRange || "");
+      setLogoPreview(data.logo || null);
+      setLogoName(data.logoName || "");
+    });
   }, [isEdit, companyId]);
 
   const set = (key) => (e) => setForm((p) => ({ ...p, [key]: e.target.value }));
@@ -246,7 +247,7 @@ export default function RegisterCompanyPage() {
     try {
       const payload = {
         ...form,
-          recruiterId, 
+        recruiterId,
         logo: logoPreview,
         logoName,
         industry: category,
@@ -254,18 +255,9 @@ export default function RegisterCompanyPage() {
         status: "pending",
       };
 
-      let result;
-      if (isEdit) {
-        const res = await fetch(`/api/companies/${companyId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        result = await res.json();
-        if (!res.ok) throw new Error(result.message || "Update failed");
-      } else {
-        result = await createCompany(payload);
-      }
+      const result = isEdit
+        ? await updateCompany(companyId, payload)
+        : await createCompany(payload);
 
       if (result) {
         toast.success(
