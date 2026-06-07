@@ -314,7 +314,7 @@ export default function JobCard({ job, company }) {
           border: "1px solid rgba(139,92,246,0.3)",
         }}
       >
-        Apply Now →
+        Browse job →
       </Link>
     </div>
   );
