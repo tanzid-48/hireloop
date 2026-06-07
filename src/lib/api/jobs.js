@@ -33,3 +33,27 @@ export const getCompanyJobs = async (companyId) => {
     return [];
   }
 };
+
+export const getAllJobs = async () => {
+  try {
+    const res = await fetch(`${baseUrl}/jobs`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+};
+
+export const getJobById = async (jobId) => {
+  const res = await fetch(`${baseUrl}/jobs/${jobId}`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch job");
+  }
+
+  return res.json();
+};

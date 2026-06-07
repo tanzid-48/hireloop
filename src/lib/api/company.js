@@ -15,3 +15,13 @@ export const getRecruiterCompany = async (recruiterId) => {
     return null;
   }
 };
+
+export const getAllCompanies = async () => {
+  try {
+    const res = await fetch(`${baseUrl}/companies`, { cache: "no-store" });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+};
