@@ -1,6 +1,8 @@
 import { getSession } from "@/lib/auth-session";
 import { redirect } from "next/navigation";
 import { getJobById } from "@/lib/api/jobs";
+import { getAllCompanies } from "@/lib/api/company";
+import ApplyForm from "./ApplyForm";
 import Link from "next/link";
 
 export default async function ApplyPage({ params }) {
@@ -11,7 +13,6 @@ export default async function ApplyPage({ params }) {
     redirect(`/signin?redirect=/jobs/${id}/apply`);
   }
 
-  // role check — recruiter apply
   if (session.user?.role !== "seeker") {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-md mx-auto text-center gap-5 px-6">
@@ -40,14 +41,13 @@ export default async function ApplyPage({ params }) {
           <p className="text-sm text-white/40 leading-relaxed">
             You are logged in as a{" "}
             <span className="text-amber-400 font-semibold">Recruiter</span>.
-            Only job seekers can apply for positions. Switch to a seeker account
-            to apply.
+            Only job seekers can apply.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Link
             href="/jobs"
-            className="px-5 h-10 rounded-xl text-sm text-white/40 flex items-center transition-colors hover:text-white/60"
+            className="px-5 h-10 rounded-xl text-sm text-white/40 flex items-center"
             style={{
               backgroundColor: "rgba(255,255,255,0.04)",
               border: "1px solid rgba(255,255,255,0.07)",
@@ -71,16 +71,18 @@ export default async function ApplyPage({ params }) {
   }
 
   const job = await getJobById(id).catch(() => null);
+  const companies = await getAllCompanies();
+  const companyId = job?.companyId?.$oid || job?.companyId;
+  const company = companies.find((c) => (c._id?.$oid || c._id) === companyId);
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-10">
-      <h1 className="text-2xl font-bold text-white mb-2">
-        Apply for {job?.title}
-      </h1>
-      <p className="text-sm text-white/40 mb-8">
-        Complete the form below to submit your application.
-      </p>
-      {/* application form */}
-    </div>
+    <ApplyForm
+      job={job}
+      jobId={id}
+      company={company}
+      userId={session.user.id}
+      userName={session.user.name}
+      userEmail={session.user.email}
+    />
   );
 }
