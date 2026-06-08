@@ -13,6 +13,7 @@ import {
   ArrowUpRightFromSquare,
   MapPin,
 } from "@gravity-ui/icons";
+import ApplyButton from "@/components/ApplyButton";
 
 const formatSalary = (min, max, currency) => {
   if (!min && !max) return null;
@@ -332,17 +333,7 @@ export default async function JobDetailPage({ params }) {
                 Deadline: {deadline}
               </div>
             )}
-            <Link
-              href={`/jobs/apply`}
-              className="w-full flex items-center justify-center gap-2 h-10 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90"
-              style={{
-                background: "linear-gradient(135deg, #a78bfa, #7c3aed)",
-                boxShadow: "0 4px 20px rgba(139,92,246,0.35)",
-              }}
-            >
-              Apply Now
-              <ArrowUpRightFromSquare className="w-3.5 h-3.5" />
-            </Link>
+           <ApplyButton jobId={id} />
           </div>
 
           {/* Job Info */}

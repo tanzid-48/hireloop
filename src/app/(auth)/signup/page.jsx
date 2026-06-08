@@ -16,9 +16,11 @@ import {
   RadioGroup,
 } from "@heroui/react";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const SignUp = () => {
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/";
   const router = useRouter();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -46,7 +48,8 @@ const SignUp = () => {
       toast.error(res.error.message || "Sign up failed");
     } else {
       toast.success("Account created successfully!");
-      router.push("/signin");
+
+      router.push(`/signin?redirect=${searchParams.get("redirect") || "/"}`);
     }
     setLoading(false);
   };
@@ -170,7 +173,10 @@ const SignUp = () => {
 
           <p className="text-center text-sm text-white/30 mt-4">
             Already have an account?{" "}
-            <a href="/signin" className="text-indigo-600 hover:underline">
+            <a
+              href={`/signin?redirect=${redirect}`}
+              className="text-indigo-600 hover:underline"
+            >
               Sign in
             </a>
           </p>

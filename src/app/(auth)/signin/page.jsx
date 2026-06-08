@@ -16,9 +16,12 @@ import {
   Label,
   TextField,
 } from "@heroui/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const SignIn = () => {
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/";
+
   const router = useRouter();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -37,7 +40,8 @@ const SignIn = () => {
       toast.error(res.error.message || "Sign in failed");
     } else {
       toast.success("Signed in successfully!");
-      router.push("/");
+      router.push(redirect);
+      router.refresh(); 
     }
     setLoading(false);
   };
@@ -161,7 +165,10 @@ const SignIn = () => {
           </Form>
           <p className="text-center text-sm text-white/30 mt-4">
             Do not have an account?{" "}
-            <a href="/signup" className="text-indigo-600 hover:underline">
+            <a
+              href={`/signup?redirect=${redirect}`}
+              className="text-indigo-600 hover:underline"
+            >
               Sign up
             </a>
           </p>
