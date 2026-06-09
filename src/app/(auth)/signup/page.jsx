@@ -35,6 +35,7 @@ const SignUp = () => {
     const name = formData.get("name");
     const image = formData.get("image");
     const role = formData.get("role");
+    const plan = role === "seeker" ? "seeker_free" : "recruiter_free";
 
     const res = await authClient.signUp.email({
       email,
@@ -42,6 +43,7 @@ const SignUp = () => {
       name,
       image: image || undefined,
       role,
+      plan,
     });
 
     if (res?.error) {
@@ -50,6 +52,7 @@ const SignUp = () => {
       toast.success("Account created successfully!");
 
       router.push(`/signin?redirect=${searchParams.get("redirect") || "/"}`);
+      router.refresh(); 
     }
     setLoading(false);
   };

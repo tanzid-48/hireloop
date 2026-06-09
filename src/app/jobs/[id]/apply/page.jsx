@@ -151,7 +151,7 @@ export default async function ApplyPage({ params }) {
             <p style={{ color: "rgba(255,255,255,0.45)" }}>
               Need more applications?{" "}
               <Link
-                href="/pricing"
+                href="/plans"
                 className="text-violet-400 font-semibold hover:underline"
               >
                 Upgrade your plan
