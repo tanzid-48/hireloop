@@ -7,6 +7,7 @@ const pricingData = {
   seekers: [
     {
       name: "Free",
+      id: "seeker_free",
       price: 0,
       tag: null,
       icon: "🔍",
@@ -22,6 +23,7 @@ const pricingData = {
     },
     {
       name: "Pro",
+      id: "seeker_pro",
       price: 19,
       tag: "Most Popular",
       icon: "⚡",
@@ -37,6 +39,7 @@ const pricingData = {
     },
     {
       name: "Premium",
+      id: "seeker_premium",
       price: 39,
       tag: "Best Value",
       icon: "👑",
@@ -55,6 +58,7 @@ const pricingData = {
   recruiters: [
     {
       name: "Free",
+      id: "recruiters_free",
       price: 0,
       tag: null,
       icon: "📋",
@@ -69,6 +73,7 @@ const pricingData = {
     },
     {
       name: "Growth",
+      id: "recruiters_growth",
       price: 49,
       tag: "Most Popular",
       icon: "📈",
@@ -84,6 +89,7 @@ const pricingData = {
     },
     {
       name: "Enterprise",
+      id: "recruiters_enterprise",
       price: 149,
       tag: "Full Power",
       icon: "🏢",
@@ -204,37 +210,27 @@ function PricingCard({ plan }) {
       </ul>
 
       {/* CTA */}
-      {plan.ctaStyle === "primary" ? (
+      {/* CTA Section - Corrected */}
+      <form
+        action="/api/checkout_sessions"
+        method="POST"
+        className="w-full mt-auto"
+      >
+        <input type="hidden" name="plan_id" value={plan.id} />
+
         <button
-          className="w-full py-2.5 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 active:scale-[0.98]"
-          style={{
-            backgroundColor: "rgba(59,130,246,0.8)",
-            border: "1px solid rgba(59,130,246,0.5)",
-          }}
+          type="submit"
+          className={`w-full py-3 rounded-xl text-center text-sm font-bold transition-all active:scale-[0.98] ${
+            plan.name === "Premium"
+              ? "bg-gradient-to-r from-violet-500 to-indigo-600 text-white shadow-[0_0_20px_rgba(139,92,246,0.4)] hover:shadow-[0_0_25px_rgba(139,92,246,0.6)] border border-white/10"
+              : plan.ctaStyle === "primary"
+                ? "bg-blue-500 hover:bg-blue-600 text-white shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+                : "border border-white/10 hover:border-white/20 text-white/70 hover:bg-white/5"
+          }`}
         >
-          {plan.cta}
+          {plan.name === "Premium" ? "Upgrade to Premium" : plan.cta}
         </button>
-      ) : plan.ctaStyle === "outline" ? (
-        <button
-          className="w-full py-2.5 rounded-xl text-sm font-semibold transition-all hover:bg-white/5 active:scale-[0.98]"
-          style={{
-            color: "rgba(255,255,255,0.6)",
-            border: "1px solid rgba(255,255,255,0.12)",
-          }}
-        >
-          {plan.cta}
-        </button>
-      ) : (
-        <button
-          className="w-full py-2.5 rounded-xl text-sm font-semibold transition-all hover:bg-white/5 active:scale-[0.98]"
-          style={{
-            color: "rgba(255,255,255,0.35)",
-            border: "1px solid rgba(255,255,255,0.07)",
-          }}
-        >
-          {plan.cta}
-        </button>
-      )}
+      </form>
     </div>
   );
 }
@@ -259,22 +255,26 @@ export default function PricingPage() {
       <div className="max-w-5xl mx-auto relative">
         {/* Header */}
         <div className="text-center mb-14">
-          <div
-            className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full mb-5"
-            style={{
-              backgroundColor: "rgba(59,130,246,0.08)",
-              color: "#60a5fa",
-              border: "1px solid rgba(59,130,246,0.2)",
-            }}
-          >
+          <div className="inline-flex items-center gap-2 text-xs font-semibold text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1.5 rounded-full mb-5">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
             Simple, transparent pricing
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight mb-4">
-            Choose your plan
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
+            Choose the plan that fits
+            <br />
+            <span
+              style={{
+                background: "linear-gradient(135deg, #60a5fa, #818cf8)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              your goals
+            </span>
           </h1>
-          <p className="text-white/35 text-base max-w-sm mx-auto">
-            No hidden fees. Cancel anytime.
+          <p className="text-zinc-500 text-base max-w-md mx-auto">
+            No hidden fees. Cancel anytime. Upgrade or downgrade as your needs
+            evolve.
           </p>
         </div>
 
