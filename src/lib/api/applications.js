@@ -23,3 +23,15 @@ export const getApplicationsByUser = async (userId) => {
     return [];
   }
 };
+
+export const getUserPlan = async (userId) => {
+  try {
+    const res = await fetch(`${baseUrl}/users/${userId}/plan`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+};

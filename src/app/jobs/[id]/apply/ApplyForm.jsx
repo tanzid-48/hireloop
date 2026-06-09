@@ -4,14 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import {
-  ArrowLeft,
-  FileArrowUp,
-  Person,
-  LogoLinkedin,
-  Globe,
-  Briefcase,
-} from "@gravity-ui/icons";
+import { ArrowLeft, FileArrowUp, LogoLinkedin, Globe } from "@gravity-ui/icons";
 import { createApplication } from "@/lib/action/applications";
 
 const iBase = {
@@ -111,7 +104,7 @@ export default function ApplyForm({
     if (!form.fullName.trim()) e.fullName = "Full name is required";
     if (!form.email.trim()) e.email = "Email is required";
     if (!form.resumeUrl.trim()) e.resumeUrl = "Resume link is required";
-    if (!form.coverLetter.trim()) e.coverLetter = "Cover letter is required";
+    
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -131,11 +124,13 @@ export default function ApplyForm({
         appliedAt: new Date().toISOString(),
       };
       const result = await createApplication(payload);
-      if (result) {
+      if (result?.success) {
         toast.success("Application submitted successfully!");
-        router.push(`/jobs/${jobId}?applied=true`);
+        router.push(`/jobs/${jobId}`);
+      } else {
+        toast.error(result?.message || "Something went wrong");
       }
-    } catch (err) {
+    } catch {
       toast.error("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
@@ -145,8 +140,8 @@ export default function ApplyForm({
   const logo = company?.logo || job?.logo;
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-10 flex flex-col gap-8 pb-16">
-      {/* ── Header ── */}
+    <div className="flex flex-col gap-6">
+      {/* Header */}
       <div className="flex items-start gap-4">
         <Link
           href={`/jobs/${jobId}`}
@@ -171,7 +166,7 @@ export default function ApplyForm({
         </div>
       </div>
 
-      {/* ── Job Info Banner ── */}
+      {/* Job Banner */}
       <div
         className="flex items-center gap-4 p-4 rounded-2xl"
         style={{
@@ -235,7 +230,7 @@ export default function ApplyForm({
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6" noValidate>
-        {/* ── Step 1: Personal Info ── */}
+        {/* Step 1 */}
         <Section
           step="01"
           title="Personal Information"
@@ -263,7 +258,6 @@ export default function ApplyForm({
               />
             </Field>
           </div>
-
           <div className="grid grid-cols-2 gap-4">
             <Field label="Phone Number" hint="Optional">
               <input
@@ -290,7 +284,7 @@ export default function ApplyForm({
           </div>
         </Section>
 
-        {/* ── Step 2: Links ── */}
+        {/* Step 2 */}
         <Section
           step="02"
           title="Links & Portfolio"
@@ -332,7 +326,6 @@ export default function ApplyForm({
               />
             </div>
           </Field>
-
           <div className="grid grid-cols-2 gap-4">
             <Field label="LinkedIn" hint="Optional">
               <div
@@ -391,7 +384,7 @@ export default function ApplyForm({
           </div>
         </Section>
 
-        {/* ── Step 3: Cover Letter ── */}
+        {/* Step 3 */}
         <Section
           step="03"
           title="Cover Letter"
@@ -418,7 +411,7 @@ export default function ApplyForm({
                   color:
                     form.coverLetter.length < 100
                       ? "rgba(248,113,113,0.7)"
-                      : "rgba(255,255,255,0.2)",
+                      : "rgba(52,211,153,0.7)",
                 }}
               >
                 {form.coverLetter.length} / 100 min
@@ -427,7 +420,7 @@ export default function ApplyForm({
           </Field>
         </Section>
 
-        {/* ── Actions ── */}
+        {/* Actions */}
         <div className="flex items-center justify-between pt-2">
           <Link
             href={`/jobs/${jobId}`}
