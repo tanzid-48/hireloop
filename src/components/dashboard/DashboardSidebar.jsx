@@ -71,7 +71,24 @@ const DashboardSidebar = async () => {
     { icon: Gear, href: "/dashboard/seeker/settings", label: "Settings" },
   ];
 
-  const navItems = role === "recruiter" ? recruiterNavLinks : seekerNavLinks;
+  const adminNavLinks = [
+    { icon: House, href: "/dashboard/admin", label: "Dashboard" },
+    { icon: Person, href: "/dashboard/admin/users", label: "Users" },
+    { icon: Briefcase, href: "/dashboard/admin/companies", label: "Companies" },
+    { icon: Magnifier, href: "/dashboard/admin/jobs", label: "Jobs" },
+    { icon: CreditCard, href: "/dashboard/admin/payments", label: "Payments" },
+    { icon: Gear, href: "/dashboard/admin/settings", label: "Settings" },
+  ];
+
+ 
+const navLinkMap = {
+  recruiter:recruiterNavLinks,
+  seeker: seekerNavLinks,
+  admin: adminNavLinks,
+};
+
+
+const navItems = navLinkMap[role] || seekerNavLinks;
 
   const navContent = (
     <div className="flex flex-col gap-1">

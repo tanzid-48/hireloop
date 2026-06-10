@@ -12,7 +12,7 @@ export default async function DashboardPage() {
 
   if (role === "recruiter") {
     redirect("/dashboard/recruiter");
-  }
-
-  redirect("/dashboard/seeker");
+  } else if (role === "admin") {
+    redirect("/dashboard/admin");
+  } else redirect("/dashboard/seeker");
 }
