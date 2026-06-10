@@ -1,7 +1,10 @@
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import { requireRole } from "@/lib/auth-session";
 import React from "react";
 
-const DashBoardLayout = ({ children }) => {
+const  RecruiterLayout = async({ children }) => {
+
+  await requireRole('recruiter')
   return (
     <div className="flex min-h-screen">
       <DashboardSidebar />
@@ -12,4 +15,4 @@ const DashBoardLayout = ({ children }) => {
   );
 };
 
-export default DashBoardLayout;
+export default RecruiterLayout;

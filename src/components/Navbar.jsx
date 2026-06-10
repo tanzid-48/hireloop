@@ -38,8 +38,9 @@ export default function Navbar() {
     seeker: "dashboard/seeker",
     recruiter: "dashboard/recruiter",
   };
-  if (user?.email) {
-    navLinks.push({
+  if (user?.email){
+    navLinks.push(
+      {
       label: "Dashboard",
       href: dashboardLinks[user?.role || "seeker"],
     });
