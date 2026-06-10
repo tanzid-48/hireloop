@@ -53,7 +53,7 @@ export default async function SeekerHomePage() {
   const usagePercentage = Math.min((monthlyCount / maxApplications) * 100, 100);
   const hasReachedLimit = planInfo?.hasReachedLimit ?? false;
 
-  const recentApps = applications?.slice(0, 5) || [];
+  const recentApps = applications?.slice(0, 3) || [];
 
   return (
     <div className="flex flex-col gap-8 max-w-4xl">
@@ -157,7 +157,7 @@ export default async function SeekerHomePage() {
           </div>
           {hasReachedLimit && (
             <Link
-              href="/pricing"
+              href="/plans"
               className="text-xs font-bold px-3 h-8 rounded-lg flex items-center text-white"
               style={{
                 background: "linear-gradient(135deg, #a78bfa, #7c3aed)",
@@ -316,7 +316,7 @@ export default async function SeekerHomePage() {
           </div>
         </Link>
         <Link
-          href="/pricing"
+          href="/plans"
           className="flex items-center gap-3 p-4 rounded-2xl transition-all hover:-translate-y-0.5"
           style={{
             backgroundColor: "rgba(52,211,153,0.05)",
