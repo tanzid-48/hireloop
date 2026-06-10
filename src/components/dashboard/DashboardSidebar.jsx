@@ -80,15 +80,13 @@ const DashboardSidebar = async () => {
     { icon: Gear, href: "/dashboard/admin/settings", label: "Settings" },
   ];
 
- 
-const navLinkMap = {
-  recruiter:recruiterNavLinks,
-  seeker: seekerNavLinks,
-  admin: adminNavLinks,
-};
+  const navLinkMap = {
+    recruiter: recruiterNavLinks,
+    seeker: seekerNavLinks,
+    admin: adminNavLinks,
+  };
 
-
-const navItems = navLinkMap[role] || seekerNavLinks;
+  const navItems = navLinkMap[role] || seekerNavLinks;
 
   const navContent = (
     <div className="flex flex-col gap-1">
@@ -104,7 +102,11 @@ const navItems = navLinkMap[role] || seekerNavLinks;
           className="text-[10px] font-bold uppercase tracking-widest"
           style={{ color: "rgba(255,255,255,0.3)" }}
         >
-          {role === "recruiter" ? "Recruiter Panel" : "Seeker Panel"}
+          {role === "admin"
+            ? "Admin Panel"
+            : role === "recruiter"
+              ? "Recruiter Panel"
+              : "Seeker Panel"}
         </p>
         <p
           className="text-xs font-semibold mt-0.5 truncate"
