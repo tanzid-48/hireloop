@@ -8,23 +8,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const navLinks = [
-  { label: "Home", href: "/" },
-  { label: "Browse Jobs", href: "/jobs" },
-  { label: "Company", href: "/company" },
-  { label: "Pricing", href: "/plans" },
-];
 
 export default function Navbar() {
-
   const { data: session } = useSession();
-  const user = session?.user;
-
-
-
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const user = session?.user;
 
   const handleSignOut = async () => {
     try {
@@ -36,6 +27,23 @@ export default function Navbar() {
       toast.error("Failed to sign out");
     }
   };
+
+  const navLinks = [
+    { label: "Home", href: "/" },
+    { label: "Browse Jobs", href: "/jobs" },
+    { label: "Company", href: "/company" },
+    { label: "Pricing", href: "/plans" },
+  ];
+  const dashboardLinks = {
+    seeker: "dashboard/seeker",
+    recruiter: "dashboard/recruiter",
+  };
+  if (user?.email) {
+    navLinks.push({
+      label: "Dashboard",
+      href: dashboardLinks[user?.role || "seeker"],
+    });
+  }
 
   return (
     <nav className="w-full bg-[#1c1c28] border-b border-white/10">
@@ -56,9 +64,7 @@ export default function Navbar() {
             />
           </Link>
 
-
           <div className="hidden md:flex items-center gap-4">
- 
             <div className="flex items-center gap-1 bg-[#2a2a3a] border border-white/10 px-2 py-1.5 rounded-2xl">
               {navLinks.map((link) => (
                 <Link
@@ -102,12 +108,10 @@ export default function Navbar() {
             )}
           </div>
 
-
           <button
             className="md:hidden p-2 text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
             onClick={() => setMenuOpen(!menuOpen)}
- 
- >
+          >
             {menuOpen ? (
               <svg
                 className="w-5 h-5"
@@ -137,10 +141,9 @@ export default function Navbar() {
                 />
               </svg>
             )}
-           </button>
+          </button>
         </div>
       </div>
-
 
       {menuOpen && (
         <div className="md:hidden border-t border-white/10 bg-[#1c1c28]">

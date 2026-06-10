@@ -1,10 +1,14 @@
+
 import React from "react";
 import {
   Briefcase,
   Bell,
   Envelope,
   Gear,
+  Bookmark,
+  FileText,
   House,
+  CreditCard,
   Magnifier,
   Person,
   SquarePlus,
@@ -12,57 +16,113 @@ import {
 } from "@gravity-ui/icons";
 import { Button, Drawer } from "@heroui/react";
 import Link from "next/link";
+import { getSession } from "@/lib/auth-session";
 
-const DashboardSidebar = () => {
-const navItems = [
-  {
-    icon: House,
-    href: "/dashboard/recruiter",
-    label: "Home",
-  },
+const DashboardSidebar = async() => {
 
-  {
-    icon: Magnifier,
-    href: "/dashboard/recruiter/jobs",
-    label: "Jobs",
-  },
+ const user = await getSession()
 
-  {
-     icon: SquarePlus,
-    href: "/dashboard/recruiter/jobs/new",
-    label: "Post A Job",
-  },
+  const recruiterNavLink = [
+    {
+      icon: House,
+      href: "/dashboard/recruiter",
+      label: "Home",
+    },
 
-  {
-    icon: Briefcase,
-    href: "/dashboard/recruiter/company",
-    label: "Company Profile",
-  },
+    {
+      icon: Magnifier,
+      href: "/dashboard/recruiter/jobs",
+      label: "Jobs",
+    },
 
-  {
-    icon: Envelope,
-    href: "/dashboard/recruiter/messages",
-    label: "Messages",
-  },
+    {
+      icon: SquarePlus,
+      href: "/dashboard/recruiter/jobs/new",
+      label: "Post A Job",
+    },
 
-  {
-    icon: Bell,
-    href: "/dashboard/recruiter/notifications",
-    label: "Notifications",
-  },
+    {
+      icon: Briefcase,
+      href: "/dashboard/recruiter/company",
+      label: "Company Profile",
+    },
 
-  {
-    icon: Person,
-    href: "/dashboard/recruiter/profile",
-    label: "Profile",
-  },
+    {
+      icon: Envelope,
+      href: "/dashboard/recruiter/messages",
+      label: "Messages",
+    },
 
-  {
-    icon: Gear,
-    href: "/dashboard/recruiter/settings",
-    label: "Settings",
-  },
-];
+    {
+      icon: Bell,
+      href: "/dashboard/recruiter/notifications",
+      label: "Notifications",
+    },
+
+    {
+      icon: Person,
+      href: "/dashboard/recruiter/profile",
+      label: "Profile",
+    },
+
+    {
+      icon: Gear,
+      href: "/dashboard/recruiter/settings",
+      label: "Settings",
+    },
+  ];
+
+  const seekerNavLinks = [
+    {
+      icon: House,
+      href: "/dashboard/seeker",
+      label: "Dashboard",
+    },
+    {
+      icon: Magnifier,
+      href: "/jobs",
+      label: "Jobs",
+    },
+    {
+      icon: Bookmark,
+      href: "/dashboard/seeker/saved-jobs",
+      label: "Saved Jobs",
+    },
+    {
+      icon: FileText,
+      href: "/dashboard/seeker/applications",
+      label: "Applications",
+    },
+    {
+      icon: CreditCard,
+      href: "/dashboard/seeker/billing",
+      label: "Billing",
+    },
+    {
+      icon: Bell,
+      href: "/dashboard/seeker/notifications",
+      label: "Notifications",
+    },
+    {
+      icon: Person,
+      href: "/dashboard/seeker/profile",
+      label: "Profile",
+    },
+    {
+      icon: Gear,
+      href: "/dashboard/seeker/settings",
+      label: "Settings",
+    },
+  ];
+
+  const navLinkMap = {
+    seeker:seekerNavLinks,
+    recruiter:recruiterNavLink
+
+  }
+
+  const navItems = navLinkMap[user?.role || 'seeker'];
+
   const navContent = (
     <nav className="flex flex-col gap-1">
       {navItems.map((item) => (
