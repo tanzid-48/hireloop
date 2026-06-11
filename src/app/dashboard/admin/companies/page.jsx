@@ -46,7 +46,7 @@ export default async function AdminCompaniesPage({ searchParams }) {
   const approved = companies.filter((c) => c.status === "approved").length;
   const rejected = companies.filter((c) => c.status === "rejected").length;
 
-  const cols = "1.5fr 1.8fr 1.2fr 1fr 1.2fr 1.4fr";
+  const cols = "1.5fr 1.6fr 1.2fr 0.8fr 1fr 1.2fr 1.2fr";
 
   return (
     <div className="flex flex-col gap-6 max-w-6xl">
@@ -83,6 +83,7 @@ export default async function AdminCompaniesPage({ searchParams }) {
             "Company Name",
             "Recruiter Email",
             "Industry",
+            "Job Count",
             "Status",
             "Date Submitted",
             "Actions",
@@ -170,6 +171,18 @@ export default async function AdminCompaniesPage({ searchParams }) {
               >
                 {company.industry || "—"}
               </p>
+              {/* Job Count */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-bold text-white">
+                  {company.jobCount ?? 0}
+                </span>
+                <span
+                  className="text-xs"
+                  style={{ color: "rgba(255,255,255,0.3)" }}
+                >
+                  jobs
+                </span>
+              </div>
 
               {/* Status */}
               <StatusDot status={company.status} />
