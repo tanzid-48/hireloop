@@ -25,3 +25,20 @@ export const getAllCompanies = async () => {
     return [];
   }
 };
+
+export const updateCompanyStatus = async (companyId, status) => {
+  try {
+    const res = await fetch(
+      `${baseUrl}/api/companies/${companyId}/status`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      }
+    );
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+};
