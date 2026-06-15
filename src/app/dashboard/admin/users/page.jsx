@@ -176,7 +176,7 @@ export default async function AdminUsersPage({ searchParams }) {
               key={id}
               className="grid items-center px-5 py-3.5 hover:bg-white/[0.02] transition-colors"
               style={{
-                gridTemplateColumns: "1.6fr 2fr 0.8fr 0.8fr 1fr 1fr 2fr",
+                gridTemplateColumns: "1.6fr 2fr 0.8fr 0.8fr 1fr 1fr 2.2fr",
                 borderBottom: isLast
                   ? "none"
                   : "1px solid rgba(255,255,255,0.04)",

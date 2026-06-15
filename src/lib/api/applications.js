@@ -1,3 +1,5 @@
+import { getAuthHeaders } from "@/lib/auth-session";
+
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL_API;
 
 export const getApplicationsByJob = async (jobId) => {
@@ -26,8 +28,10 @@ export const getApplicationsByUser = async (userId) => {
 
 export const getUserPlan = async (userId) => {
   try {
+    const headers = await getAuthHeaders();
     const res = await fetch(`${baseUrl}/users/${userId}/plan`, {
       cache: "no-store",
+      headers,
     });
     if (!res.ok) return null;
     return res.json();

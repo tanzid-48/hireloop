@@ -3,18 +3,20 @@ import React, { useState } from "react";
 import { Table, Chip } from "@heroui/react";
 import { Eye, Pencil, TrashBin } from "@gravity-ui/icons";
 import { useRouter } from "next/navigation";
+import { deleteJob } from "@/lib/action/jobs";
+import { toast } from "sonner";
 
 const statusConfig = {
-  active:   { color: "success", label: "Active" },
+  active: { color: "success", label: "Active" },
   inactive: { color: "default", label: "Inactive" },
-  closed:   { color: "danger",  label: "Closed" },
-  draft:    { color: "warning", label: "Draft" },
+  closed: { color: "danger", label: "Closed" },
+  draft: { color: "warning", label: "Draft" },
 };
 
 const ActionBtn = ({ onClick, children, variant = "default" }) => {
   const colors = {
     default: "text-white/30 hover:text-white/70 hover:bg-white/[0.06]",
-    danger:  "text-white/30 hover:text-red-400 hover:bg-red-400/[0.08]",
+    danger: "text-white/30 hover:text-red-400 hover:bg-red-400/[0.08]",
     primary: "text-white/30 hover:text-violet-400 hover:bg-violet-400/[0.08]",
   };
   return (
@@ -35,10 +37,15 @@ export default function JobsTable({ jobs = [] }) {
     if (!confirm("Are you sure you want to delete this job?")) return;
     setDeletingId(id);
     try {
-      await fetch(`/api/jobs/${id}`, { method: "DELETE" });
-      router.refresh();
-    } catch (err) {
-      console.error(err);
+      const result = await deleteJob(id); 
+      if (result) {
+        toast.success("Job deleted");
+        router.refresh();
+      } else {
+        toast.error("Failed to delete job");
+      }
+    } catch {
+      toast.error("Something went wrong");
     } finally {
       setDeletingId(null);
     }
@@ -54,17 +61,49 @@ export default function JobsTable({ jobs = [] }) {
 
   if (jobs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 rounded-2xl"
-        style={{ backgroundColor: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-        <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
-          style={{ backgroundColor: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.15)" }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-violet-400">
-            <rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-            <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="1.5"/>
+      <div
+        className="flex flex-col items-center justify-center py-20 rounded-2xl"
+        style={{
+          backgroundColor: "rgba(255,255,255,0.02)",
+          border: "1px solid rgba(255,255,255,0.06)",
+        }}
+      >
+        <div
+          className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
+          style={{
+            backgroundColor: "rgba(139,92,246,0.08)",
+            border: "1px solid rgba(139,92,246,0.15)",
+          }}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="text-violet-400"
+          >
+            <rect
+              x="3"
+              y="7"
+              width="18"
+              height="13"
+              rx="2"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            />
+            <path
+              d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            />
           </svg>
         </div>
-        <p className="text-sm font-semibold text-white/50">No jobs posted yet</p>
-        <p className="text-xs text-white/25 mt-1">Create your first listing to get started</p>
+        <p className="text-sm font-semibold text-white/50">
+          No jobs posted yet
+        </p>
+        <p className="text-xs text-white/25 mt-1">
+          Create your first listing to get started
+        </p>
       </div>
     );
   }
@@ -78,7 +117,12 @@ export default function JobsTable({ jobs = [] }) {
           style={{ backgroundColor: "transparent" }}
         >
           <Table.Header>
-            <Table.Column isRowHeader defaultWidth="2fr" id="title" minWidth={200}>
+            <Table.Column
+              isRowHeader
+              defaultWidth="2fr"
+              id="title"
+              minWidth={200}
+            >
               Job Title
               <Table.ColumnResizer />
             </Table.Column>
@@ -111,7 +155,6 @@ export default function JobsTable({ jobs = [] }) {
 
               return (
                 <Table.Row key={id} className={isDeleting ? "opacity-50" : ""}>
-
                   {/* Job Title */}
                   <Table.Cell>
                     <div className="flex flex-col gap-0.5">
@@ -126,8 +169,14 @@ export default function JobsTable({ jobs = [] }) {
 
                   {/* Type */}
                   <Table.Cell>
-                    <span className="text-xs font-medium px-2.5 py-1 rounded-lg capitalize"
-                      style={{ backgroundColor: "rgba(139,92,246,0.08)", color: "rgba(167,139,250,0.9)", border: "1px solid rgba(139,92,246,0.15)" }}>
+                    <span
+                      className="text-xs font-medium px-2.5 py-1 rounded-lg capitalize"
+                      style={{
+                        backgroundColor: "rgba(139,92,246,0.08)",
+                        color: "rgba(167,139,250,0.9)",
+                        border: "1px solid rgba(139,92,246,0.15)",
+                      }}
+                    >
                       {job.jobType?.replace("-", " ") || "—"}
                     </span>
                   </Table.Cell>
@@ -143,7 +192,11 @@ export default function JobsTable({ jobs = [] }) {
                   <Table.Cell>
                     <span className="text-sm text-white/50">
                       {job.deadline
-                        ? new Date(job.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                        ? new Date(job.deadline).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })
                         : "—"}
                     </span>
                   </Table.Cell>
@@ -160,13 +213,17 @@ export default function JobsTable({ jobs = [] }) {
                     <div className="flex items-center gap-1">
                       <ActionBtn
                         variant="primary"
-                        onClick={() => router.push(`/dashboard/recruiter/jobs/${id}`)}
+                        onClick={() =>
+                          router.push(`/dashboard/recruiter/jobs/${id}`)
+                        }
                       >
                         <Eye className="w-3.5 h-3.5" />
                       </ActionBtn>
                       <ActionBtn
                         variant="default"
-                        onClick={() => router.push(`/dashboard/recruiter/jobs/${id}/edit`)}
+                        onClick={() =>
+                          router.push(`/dashboard/recruiter/jobs/${id}/edit`)
+                        }
                       >
                         <Pencil className="w-3.5 h-3.5" />
                       </ActionBtn>
@@ -178,7 +235,6 @@ export default function JobsTable({ jobs = [] }) {
                       </ActionBtn>
                     </div>
                   </Table.Cell>
-
                 </Table.Row>
               );
             })}
