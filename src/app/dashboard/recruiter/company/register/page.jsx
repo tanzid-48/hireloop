@@ -9,12 +9,10 @@ import {
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import {
-  createCompany,
-  getCompanyById,
-  updateCompany,
-} from "@/lib/action/company";
+
 import { useSession } from "@/lib/auth-client";
+import { getCompanyByUserId } from "@/lib/api/jobs";
+import { createCompany, updateCompany } from "@/lib/action/company";
 
 const CATEGORIES = [
   "Technology",
@@ -186,7 +184,7 @@ export default function RegisterCompanyPage() {
 
   useEffect(() => {
     if (!isEdit || !companyId) return;
-    getCompanyById(companyId).then((data) => {
+    getCompanyByUserId(companyId).then((data) => {
       if (!data) return;
       setForm({
         name: data.name || "",
