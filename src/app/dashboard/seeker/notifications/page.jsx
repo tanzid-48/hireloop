@@ -39,7 +39,7 @@ const MOCK = [
 
 export default function NotificationsPage() {
   return (
-    <div className="flex flex-col gap-6 max-w-2xl">
+    <div className="flex flex-col gap-6 max-w-2xl mx-auto">
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>

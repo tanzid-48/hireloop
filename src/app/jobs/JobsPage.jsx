@@ -176,6 +176,8 @@ export default function JobsPage({
   currentPage,
   companyMap,
   filters,
+  userId,
+  savedJobIds = [],
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -405,7 +407,9 @@ export default function JobsPage({
             <JobCard
               key={job._id?.$oid || job._id}
               job={job}
-              company={companyMap?.[job.companyId?.$oid || job.companyId]}
+              company={companyMap?.[job.companyId]}
+              userId={userId}
+              isSavedInitially={savedJobIds.includes(job._id?.$oid || job._id)}
             />
           ))}
         </div>
