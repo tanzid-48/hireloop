@@ -57,3 +57,26 @@ export const getJobById = async (jobId) => {
 
   return res.json();
 };
+
+// ← NEW: server-side paginated
+export const getJobsPaginated = async ({
+  page = 1,
+  limit = 9,
+  search = "",
+  category = "",
+  jobType = "",
+  sort = "newest",
+} = {}) => {
+  try {
+    const params = new URLSearchParams({ page, limit, sort });
+    if (search) params.set("search", search);
+    if (category && category !== "All") params.set("category", category);
+    if (jobType && jobType !== "All Types") params.set("jobType", jobType);
+
+    const res = await fetch(`${baseUrl}/jobs?${params}`, { cache: "no-store" });
+    if (!res.ok) return { jobs: [], total: 0, totalPages: 1, page: 1 };
+    return res.json();
+  } catch {
+    return { jobs: [], total: 0, totalPages: 1, page: 1 };
+  }
+};

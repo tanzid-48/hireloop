@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import JobCard from "@/components/JobCard";
 import { MapPin, ArrowLeft, ArrowRight } from "@gravity-ui/icons";
 
-const ITEMS_PER_PAGE = 9;
 const CATEGORIES = [
   "All",
   "Engineering",
@@ -26,6 +26,7 @@ const JOB_TYPES = [
   "Contract",
   "Internship",
 ];
+
 const CATEGORY_COLORS = {
   Engineering: {
     bg: "rgba(99,102,241,0.12)",
@@ -84,6 +85,7 @@ const CATEGORY_COLORS = {
   },
 };
 
+/* ── Custom Dropdown ── */
 const CustomDropdown = ({ value, onChange, options, placeholder }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -94,6 +96,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder }) => {
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, []);
+
   return (
     <div ref={ref} className="relative shrink-0">
       <button
@@ -138,10 +141,7 @@ const CustomDropdown = ({ value, onChange, options, placeholder }) => {
             border: "1px solid rgba(255,255,255,0.08)",
           }}
         >
-          <div
-            className="py-1.5 max-h-64 overflow-y-auto"
-            style={{ backgroundColor: "#13131f" }}
-          >
+          <div className="py-1.5 max-h-64 overflow-y-auto">
             {options.map((opt) => (
               <button
                 key={opt}
@@ -150,11 +150,11 @@ const CustomDropdown = ({ value, onChange, options, placeholder }) => {
                   onChange(opt);
                   setOpen(false);
                 }}
+                className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors ${value === opt ? "text-violet-400" : "text-white/60 hover:text-white hover:bg-white/[0.04]"}`}
                 style={{
                   backgroundColor:
                     value === opt ? "rgba(139,92,246,0.08)" : "transparent",
                 }}
-                className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors ${value === opt ? "text-violet-400" : "text-white/60 hover:text-white hover:bg-white/[0.04]"}`}
               >
                 {opt}
                 {value === opt && (
@@ -169,50 +169,44 @@ const CustomDropdown = ({ value, onChange, options, placeholder }) => {
   );
 };
 
-export default function JobsPage({ jobs, companyMap }) {
-  const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [jobType, setJobType] = useState("All Types");
-  const [sort, setSort] = useState("newest");
-  const [page, setPage] = useState(1);
+export default function JobsPage({
+  jobs,
+  total,
+  totalPages,
+  currentPage,
+  companyMap,
+  filters,
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
 
-  const filtered = useMemo(() => {
-    let list = [...jobs];
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter(
-        (j) =>
-          j.title?.toLowerCase().includes(q) ||
-          j.category?.toLowerCase().includes(q) ||
-          j.city?.toLowerCase().includes(q) ||
-          companyMap?.[j.companyId]?.name?.toLowerCase().includes(q),
-      );
-    }
-    if (activeCategory !== "All")
-      list = list.filter((j) => j.category === activeCategory);
-    if (jobType !== "All Types") {
-      if (jobType === "Remote") list = list.filter((j) => j.isRemote === true);
-      else list = list.filter((j) => j.jobType === jobType);
-    }
-    if (sort === "newest")
-      list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    else if (sort === "salary")
-      list.sort((a, b) => Number(b.salaryMax || 0) - Number(a.salaryMax || 0));
-    return list;
-  }, [jobs, search, activeCategory, jobType, sort, companyMap]);
+  // Local search state for instant typing feedback
+  const [localSearch, setLocalSearch] = useState(filters.search || "");
 
-  // pagination reset
-  const resetPage = () => setPage(1);
-  const total = filtered.length;
-  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
-  const start = (page - 1) * ITEMS_PER_PAGE;
-  const paginated = filtered.slice(start, start + ITEMS_PER_PAGE);
+  // ── URL navigation (triggers server fetch) ──
+  const navigate = (overrides) => {
+    const merged = { ...filters, page: 1, ...overrides };
+    const params = new URLSearchParams();
+    if (merged.search) params.set("search", merged.search);
+    if (merged.category && merged.category !== "All")
+      params.set("category", merged.category);
+    if (merged.jobType && merged.jobType !== "All Types")
+      params.set("jobType", merged.jobType);
+    if (merged.sort && merged.sort !== "newest")
+      params.set("sort", merged.sort);
+    if (merged.page > 1) params.set("page", merged.page);
+    startTransition(() => router.push(`${pathname}?${params.toString()}`));
+  };
 
-  const pageNumbers = () => {
-    if (totalPages <= 5)
+  const handleSearchSubmit = () => navigate({ search: localSearch });
+
+  // Page numbers with dots
+  const pageNums = () => {
+    if (totalPages <= 6)
       return Array.from({ length: totalPages }, (_, i) => i + 1);
-    if (page <= 3) return [1, 2, 3, 4, "...", totalPages];
-    if (page >= totalPages - 2)
+    if (currentPage <= 3) return [1, 2, 3, 4, "...", totalPages];
+    if (currentPage >= totalPages - 2)
       return [
         1,
         "...",
@@ -221,11 +215,36 @@ export default function JobsPage({ jobs, companyMap }) {
         totalPages - 1,
         totalPages,
       ];
-    return [1, "...", page - 1, page, page + 1, "...", totalPages];
+    return [
+      1,
+      "...",
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+      "...",
+      totalPages,
+    ];
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10 flex flex-col gap-6">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col gap-6">
+      {/* Loading overlay */}
+      {isPending && (
+        <div className="fixed inset-0 z-50 pointer-events-none flex items-start justify-center pt-20">
+          <div
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold"
+            style={{
+              backgroundColor: "rgba(139,92,246,0.15)",
+              border: "1px solid rgba(139,92,246,0.3)",
+              color: "#a78bfa",
+            }}
+          >
+            <span className="w-3 h-3 rounded-full border-2 border-violet-400 border-t-transparent animate-spin" />
+            Loading jobs...
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div>
         <span className="text-[10px] font-bold tracking-[3px] uppercase text-violet-400/70">
@@ -236,12 +255,13 @@ export default function JobsPage({ jobs, companyMap }) {
         </h1>
         <p className="text-sm text-white/30 mt-1">
           {total} job{total !== 1 ? "s" : ""} found
-          {total > 0 && ` · Page ${page} of ${totalPages}`}
+          {totalPages > 1 && ` · Page ${currentPage} of ${totalPages}`}
         </p>
       </div>
 
       {/* Search + Type + Sort */}
       <div className="flex items-center gap-3 flex-wrap">
+        {/* Search */}
         <div
           className="flex items-center gap-3 flex-1 min-w-[200px] px-4 py-2.5 rounded-xl"
           style={{
@@ -267,18 +287,16 @@ export default function JobsPage({ jobs, companyMap }) {
           <input
             type="text"
             placeholder="Search jobs, skills, company…"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              resetPage();
-            }}
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearchSubmit()}
             className="flex-1 bg-transparent text-sm text-white placeholder:text-white/20 outline-none"
           />
-          {search && (
+          {localSearch && (
             <button
               onClick={() => {
-                setSearch("");
-                resetPage();
+                setLocalSearch("");
+                navigate({ search: "" });
               }}
               className="text-white/20 hover:text-white/50 transition-colors text-xs"
             >
@@ -286,15 +304,16 @@ export default function JobsPage({ jobs, companyMap }) {
             </button>
           )}
         </div>
+
+        {/* Job Type */}
         <CustomDropdown
-          value={jobType}
-          onChange={(v) => {
-            setJobType(v);
-            resetPage();
-          }}
+          value={filters.jobType || "All Types"}
+          onChange={(v) => navigate({ jobType: v })}
           options={JOB_TYPES}
           placeholder="All Types"
         />
+
+        {/* Sort */}
         <div
           className="flex items-center gap-1 p-1 rounded-xl"
           style={{
@@ -308,13 +327,10 @@ export default function JobsPage({ jobs, companyMap }) {
           ].map((opt) => (
             <button
               key={opt.key}
-              onClick={() => {
-                setSort(opt.key);
-                resetPage();
-              }}
+              onClick={() => navigate({ sort: opt.key })}
               className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
               style={
-                sort === opt.key
+                (filters.sort || "newest") === opt.key
                   ? {
                       backgroundColor: "rgba(139,92,246,0.2)",
                       color: "#a78bfa",
@@ -335,24 +351,21 @@ export default function JobsPage({ jobs, companyMap }) {
       {/* Category Pills */}
       <div className="flex items-center gap-2 flex-wrap">
         {CATEGORIES.map((cat) => {
-          const isActive = activeCategory === cat;
+          const isAct = (filters.category || "All") === cat;
           const color = CATEGORY_COLORS[cat];
           return (
             <button
               key={cat}
-              onClick={() => {
-                setActiveCategory(cat);
-                resetPage();
-              }}
+              onClick={() => navigate({ category: cat })}
               className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
               style={
-                isActive && cat === "All"
+                isAct && cat === "All"
                   ? {
                       backgroundColor: "rgba(139,92,246,0.15)",
                       color: "#a78bfa",
                       border: "1px solid rgba(139,92,246,0.25)",
                     }
-                  : isActive && color
+                  : isAct && color
                     ? {
                         backgroundColor: color.bg,
                         color: color.color,
@@ -372,7 +385,7 @@ export default function JobsPage({ jobs, companyMap }) {
       </div>
 
       {/* Grid */}
-      {paginated.length === 0 ? (
+      {jobs.length === 0 ? (
         <div
           className="flex flex-col items-center justify-center py-24 rounded-2xl text-center gap-3"
           style={{
@@ -388,11 +401,11 @@ export default function JobsPage({ jobs, companyMap }) {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {paginated.map((job) => (
+          {jobs.map((job) => (
             <JobCard
               key={job._id?.$oid || job._id}
               job={job}
-              company={companyMap?.[job.companyId]}
+              company={companyMap?.[job.companyId?.$oid || job.companyId]}
             />
           ))}
         </div>
@@ -407,14 +420,14 @@ export default function JobsPage({ jobs, companyMap }) {
           >
             Showing{" "}
             <strong className="text-white/60">
-              {start + 1}–{Math.min(start + ITEMS_PER_PAGE, total)}
+              {(currentPage - 1) * 9 + 1}–{Math.min(currentPage * 9, total)}
             </strong>{" "}
             of <strong className="text-white/60">{total}</strong> jobs
           </p>
           <div className="flex items-center gap-2 order-1 sm:order-2">
             <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
+              onClick={() => navigate({ page: currentPage - 1 })}
+              disabled={currentPage === 1 || isPending}
               className="w-8 h-8 rounded-lg flex items-center justify-center transition-all disabled:opacity-20"
               style={{
                 border: "1px solid rgba(255,255,255,0.07)",
@@ -423,10 +436,10 @@ export default function JobsPage({ jobs, companyMap }) {
             >
               <ArrowLeft className="w-3.5 h-3.5" />
             </button>
-            {pageNumbers().map((p, i) =>
+            {pageNums().map((p, i) =>
               p === "..." ? (
                 <span
-                  key={`dots-${i}`}
+                  key={`d${i}`}
                   className="w-8 h-8 flex items-center justify-center text-xs"
                   style={{ color: "rgba(255,255,255,0.3)" }}
                 >
@@ -435,10 +448,11 @@ export default function JobsPage({ jobs, companyMap }) {
               ) : (
                 <button
                   key={p}
-                  onClick={() => setPage(p)}
+                  onClick={() => navigate({ page: p })}
+                  disabled={isPending}
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-semibold transition-all"
                   style={
-                    p === page
+                    p === currentPage
                       ? {
                           background:
                             "linear-gradient(135deg, #a78bfa, #7c3aed)",
@@ -455,8 +469,8 @@ export default function JobsPage({ jobs, companyMap }) {
               ),
             )}
             <button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
+              onClick={() => navigate({ page: currentPage + 1 })}
+              disabled={currentPage === totalPages || isPending}
               className="w-8 h-8 rounded-lg flex items-center justify-center transition-all disabled:opacity-20"
               style={{
                 border: "1px solid rgba(255,255,255,0.07)",
