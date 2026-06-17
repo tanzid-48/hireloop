@@ -574,7 +574,7 @@ GET    /admin/subscriptions              All subscriptions         [admin]
 | 🏠 Home            | [hireloop-ruby.vercel.app](https://hireloop-ruby.vercel.app) |
 | 💼 Browse Jobs     | [/jobs](https://hireloop-ruby.vercel.app/jobs)               |
 | 🏭 Companies       | [/company](https://hireloop-ruby.vercel.app/company)         |
-| 💳 Pricing & Plans | [/pricing](https://hireloop-ruby.vercel.app/pricing)         |
+| 💳 Pricing & Plans | [/plans](https://hireloop-ruby.vercel.app/pricing)         |
 | 🔐 Sign In         | [/signin](https://hireloop-ruby.vercel.app/signin)           |
 | 📝 Sign Up         | [/signup](https://hireloop-ruby.vercel.app/signup)           |
 
